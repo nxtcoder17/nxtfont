@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  FONT_NAME: "NxtFont"
+
+jobs:
+  github-release:
+    name: Create Github Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      is_nightly: ${{ steps.meta.outputs.is_nightly }}
+      sanitized_ref: ${{ steps.meta.outputs.sanitized_ref }}
+    steps:
+      - uses: nxtcoder17/actions/metadata@main
+        id: meta
+
+      - name: create github release
+        uses: nxtcoder17/actions/github-release-create@main
+        with:
+          name: ${{steps.meta.outputs.version}}
+          github_token: ${{ github.token }}
+          pre_release: ${{ !fromJSON(steps.meta.outputs.is_tag) }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - github-release
+    strategy:
+      matrix:
+        font_type:
+          - ttf
+          - webfont
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install ttfautohint
+        run: |
+          sudo apt-get update
+          sudo apt-get install ttfautohint
+
+      - name: Clone Iosevka
+        run: |
+          git clone --depth 1 https://github.com/be5invis/Iosevka.git
+          cp ./private-build-plans.toml ./Iosevka/private-build-plans.toml
+
+      - name: Building ${{ env.FONT_NAME }}-${{ matrix.font_type }}
+        run: |
+          pushd Iosevka
+          npm install
+          npm run build -- ${{matrix.font_type}}::${{ env.FONT_NAME }}
+          popd
+
+      - name: Zip build files
+        run: |
+          zip -r ${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip Iosevka/dist/${{ env.FONT_NAME }}
+
+      - name: upload to github_release
+        uses: nxtcoder17/actions/github-release-upload@main
+        with:
+          name: ${{needs.github-release.outputs.version}}
+          github_token: ${{ github.token }}
+          files: |+
+            ${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip

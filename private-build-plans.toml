@@ -13,6 +13,8 @@ seven = "bend-serifless-crossbar"
 nine = "open-contour"
 zero = "slashed"
 capital-k = "straight-bottom-right-serifed"
+capital-q = "crossing"
+capital-w = "straight-almost-flat-top-motion-serifed"
 capital-z = "straight-serifless-with-horizontal-crossbar"
 f = "tailed"
 k = "straight-bottom-right-serifed"
@@ -35,6 +37,26 @@ css = 400
 shape = 700
 menu = 700
 css = 700
+
+[buildPlans.NxtFont.weights.Medium]
+shape = 500
+menu = 500
+css = 500
+
+[buildPlans.NxtFont.weights.SemiBold]
+shape = 600
+menu = 600
+css = 600
+
+[buildPlans.NxtFont.weights.ExtraBold]
+shape = 800
+menu = 800
+css = 800
+
+[buildPlans.NxtFont.weights.Heavy]
+shape = 900
+menu = 900
+css = 900
 
 [buildPlans.NxtFont.slopes.Upright]
 angle = 0

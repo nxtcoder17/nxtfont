@@ -57,8 +57,8 @@ jobs:
 
       - name: Install ttfautohint
         run: |
-          sudo apt-get update
-          sudo apt-get install ttfautohint
+          sudo apt update
+          sudo apt install -y --no-install-recommends ttfautohint
 
       - name: Clone Iosevka
         run: |
@@ -66,15 +66,15 @@ jobs:
           cp ./private-build-plans.toml ./Iosevka/private-build-plans.toml
 
       - name: Building ${{ env.FONT_NAME }}-${{ matrix.font_type }}
+        working-directory: Iosevka
         run: |
-          pushd Iosevka
           npm install
           npm run build -- ${{matrix.font_type}}::${{ env.FONT_NAME }}
-          popd
 
       - name: Zip build files
+        working-directory: Iosevka/dist
         run: |
-          zip -r ${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip Iosevka/dist/${{ env.FONT_NAME }}
+          zip -r ${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip ${{ env.FONT_NAME }}
 
       - name: upload to github_release
         uses: nxtcoder17/actions/github-release-upload@main
@@ -82,4 +82,4 @@ jobs:
           name: ${{needs.github-release.outputs.version}}
           github_token: ${{ github.token }}
           files: |+
-            ${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip
+            Iosevka/dist/${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip

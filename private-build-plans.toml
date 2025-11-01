@@ -1,6 +1,6 @@
 [buildPlans.NxtFont]
 family = "NxtFont"
-spacing = "normal"
+spacing = "term"
 serifs = "sans"
 noCvSs = false
 exportGlyphNames = true
@@ -24,6 +24,7 @@ k = "straight-bottom-right-serifed"
 l = "serifed-diagonal-tailed"
 q = "top-cut-diagonal-tailed-serifless"
 t = "diagonal-tailed"
+x = "semi-chancery-curly-serifless"
 y = "cursive-motion-serifed"
 z = "straight-serifless-with-crossbar"
 lower-lambda = "tailed-turn"

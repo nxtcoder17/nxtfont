@@ -1,32 +1,36 @@
 [buildPlans.NxtFont]
 family = "NxtFont"
-spacing = "term"
+spacing = "normal"
 serifs = "sans"
 noCvSs = false
-exportGlyphNames = false
+exportGlyphNames = true
 
 [buildPlans.NxtFont.variants.design]
 one = "base-long-top-serif"
 three = "flat-top-serifless"
+four = "open-non-crossing-serifless"
 six = "open-contour"
 seven = "bend-serifless-crossbar"
 nine = "open-contour"
 zero = "slashed"
 capital-k = "straight-bottom-right-serifed"
-capital-q = "crossing"
+capital-q = "crossing-baseline"
 capital-w = "straight-almost-flat-top-motion-serifed"
-capital-z = "straight-serifless-with-horizontal-crossbar"
+capital-z = "straight-serifless-with-crossbar"
 f = "tailed"
+i = "serifed-diagonal-tailed"
+j = "diagonal-tailed-serifless"
 k = "straight-bottom-right-serifed"
+l = "serifed-diagonal-tailed"
 q = "top-cut-diagonal-tailed-serifless"
 t = "diagonal-tailed"
 y = "cursive-motion-serifed"
-z = "straight-serifless-with-horizontal-crossbar"
+z = "straight-serifless-with-crossbar"
 lower-lambda = "tailed-turn"
+number-sign = "slanted-tall"
 at = "compact"
-
-  [buildPlans.NxtFont.ligations]
-  inherits = "dlig"
+dollar = "slanted-through"
+percent = "rings-continuous-slash"
 
 [buildPlans.NxtFont.weights.Regular]
 shape = 400
@@ -52,11 +56,6 @@ css = 600
 shape = 800
 menu = 800
 css = 800
-
-[buildPlans.NxtFont.weights.Heavy]
-shape = 900
-menu = 900
-css = 900
 
 [buildPlans.NxtFont.slopes.Upright]
 angle = 0

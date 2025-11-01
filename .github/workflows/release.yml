@@ -65,7 +65,7 @@ jobs:
           git clone --depth 1 https://github.com/be5invis/Iosevka.git
           cp ./private-build-plans.toml ./Iosevka/private-build-plans.toml
 
-      - name: Building ${{ env.FONT_NAME }}-${{ matrix.font_type }}
+      - name: Building NxtFont
         working-directory: Iosevka
         run: |
           npm install

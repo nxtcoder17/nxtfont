@@ -2,11 +2,7 @@ name: Release
 
 on:
   workflow_dispatch:
-
   push:
-    branches:
-      - master
-
     tags:
       - 'v*'
 
@@ -74,7 +70,10 @@ jobs:
       - name: Zip build files
         working-directory: Iosevka/dist
         run: |
-          zip -r ${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip ${{ env.FONT_NAME }}
+          mkdir -p /tmp/output
+          zip -r /tmp/output/${{ env.FONT_NAME }}-${{ matrix.font_type }}+unhinted.zip ${{ env.FONT_NAME }}
+          rm -rf ${{ env.FONT_NAME }}/TTF-Unhinted
+          zip -r /tmp/output/${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip ${{ env.FONT_NAME }}
 
       - name: upload to github_release
         uses: nxtcoder17/actions/github-release-upload@main
@@ -82,4 +81,4 @@ jobs:
           name: ${{needs.github-release.outputs.version}}
           github_token: ${{ github.token }}
           files: |+
-            Iosevka/dist/${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip
+            /tmp/output/*

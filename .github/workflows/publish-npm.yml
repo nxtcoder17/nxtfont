@@ -26,6 +26,8 @@ jobs:
       (github.event.workflow_run.conclusion == 'success' &&
        startsWith(github.event.workflow_run.head_branch, 'v'))
     steps:
+      - uses: actions/checkout@v4
+
       - name: Set version
         id: version
         run: |
@@ -42,61 +44,27 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Download webfont from release
+      - name: Download subset webfont from release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release download "${{ steps.version.outputs.tag }}" \
             --repo ${{ github.repository }} \
-            --pattern "${{ env.FONT_NAME }}-webfont.zip" \
-            --output webfont.zip
-          unzip webfont.zip
+            --pattern "${{ env.FONT_NAME }}-webfont-subset.zip" \
+            --output webfont-subset.zip
 
       - name: Prepare package
         run: |
+          unzip webfont-subset.zip
           mkdir -p WOFF2
-          cp -r ./${{ env.FONT_NAME }}/WOFF2/* ./WOFF2/
-          rm -rf ./${{ env.FONT_NAME }} webfont.zip
+          cp -r ./${{ env.FONT_NAME }}/WOFF2-subset/* ./WOFF2/
+          rm -rf ./${{ env.FONT_NAME }} webfont-subset.zip
 
       - name: Generate package.json and CSS
-        run: |
-          node -e '
-          const fs = require("fs");
-
-          const pkg = {
-            name: "${{ env.PACKAGE_NAME }}",
-            version: "${{ steps.version.outputs.npm }}",
-            description: "NxtFont - A custom Iosevka build",
-            keywords: ["font", "iosevka", "monospace", "webfont"],
-            author: "nxtcoder17",
-            license: "OFL-1.1",
-            repository: {
-              type: "git",
-              url: "https://github.com/${{ github.repository }}"
-            },
-            files: ["WOFF2/**/*", "nxtfont.css"]
-          };
-          fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
-
-          const weights = [
-            { name: "Regular", weight: 400 },
-            { name: "Medium", weight: 500 },
-            { name: "SemiBold", weight: 600 },
-            { name: "Bold", weight: 700 },
-            { name: "ExtraBold", weight: 800 }
-          ];
-
-          let css = `/* NxtFont - Custom Iosevka Build */\n/* https://github.com/${{ github.repository }} */\n\n`;
-
-          for (const w of weights) {
-            css += `/* ${w.name} */\n`;
-            css += `@font-face {\n  font-family: "NxtFont";\n  src: url("./WOFF2/NxtFont-${w.name}.woff2") format("woff2");\n  font-weight: ${w.weight};\n  font-style: normal;\n  font-display: swap;\n}\n\n`;
-            const italicName = w.name === "Regular" ? "Italic" : w.name + "Italic";
-            css += `@font-face {\n  font-family: "NxtFont";\n  src: url("./WOFF2/NxtFont-${italicName}.woff2") format("woff2");\n  font-weight: ${w.weight};\n  font-style: italic;\n  font-display: swap;\n}\n\n`;
-          }
-
-          fs.writeFileSync("nxtfont.css", css);
-          '
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.npm }}
+          REPO_URL: https://github.com/${{ github.repository }}
+        run: node ./scripts/generate-package.js
 
       - name: Publish to npm
         run: npm publish --access public

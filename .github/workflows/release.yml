@@ -56,6 +56,16 @@ jobs:
           sudo apt update
           sudo apt install -y --no-install-recommends ttfautohint
 
+      - name: Setup Python (webfont only)
+        if: matrix.font_type == 'webfont'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install fonttools (webfont only)
+        if: matrix.font_type == 'webfont'
+        run: pip install fonttools[woff]
+
       - name: Clone Iosevka
         run: |
           git clone --depth 1 https://github.com/be5invis/Iosevka.git
@@ -67,6 +77,7 @@ jobs:
           npm install
           npm run build -- ${{matrix.font_type}}::${{ env.FONT_NAME }}
 
+      # Zip BEFORE subsetting so full zips don't contain subset files
       - name: Zip build files
         working-directory: Iosevka/dist
         run: |
@@ -75,6 +86,20 @@ jobs:
           rm -rf ${{ env.FONT_NAME }}/TTF-Unhinted
           zip -r /tmp/output/${{ env.FONT_NAME }}-${{ matrix.font_type }}.zip ${{ env.FONT_NAME }}
 
+      - name: Generate font subsets (webfont only)
+        if: matrix.font_type == 'webfont'
+        run: |
+          ./scripts/subset-fonts.sh ./Iosevka/dist/${{ env.FONT_NAME }}/WOFF2
+          mv ./Iosevka/dist/${{ env.FONT_NAME }}/WOFF2/subsets \
+             ./Iosevka/dist/${{ env.FONT_NAME }}/WOFF2-subset
+
+      - name: Zip subset files (webfont only)
+        if: matrix.font_type == 'webfont'
+        working-directory: Iosevka/dist
+        run: |
+          zip -r /tmp/output/${{ env.FONT_NAME }}-webfont-subset.zip \
+            ${{ env.FONT_NAME }}/WOFF2-subset
+
       - name: upload to github_release
         uses: nxtcoder17/actions/github-release-upload@main
         with:
@@ -82,4 +107,3 @@ jobs:
           github_token: ${{ github.token }}
           files: |+
             /tmp/output/*
-

@@ -72,3 +72,12 @@ angle = 9.4
 shape = "italic"
 menu = "italic"
 css = "italic"
+
+# NxtFont ships a single width grade. Iosevka's default width list includes both
+# Normal and Extended, so pin the list to Normal only (matching Iosevka's own
+# Normal default) to build just the one.
+
+[buildPlans.NxtFont.widths.Normal]
+shape = 500
+menu = 5
+css = "normal"

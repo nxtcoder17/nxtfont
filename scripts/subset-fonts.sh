@@ -20,6 +20,16 @@ LATIN_EXT="U+0100-024F,U+0259,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,
 
 SYMBOLS="U+2000-206F,U+2190-21FF,U+2200-22FF,U+2300-23FF,U+2500-257F,U+25A0-25FF,U+2600-26FF,U+FE00-FE0F,U+FE20-FE2F"
 
+# --- Layout features ---
+# OpenType features retain the glyphs they substitute, so keeping every feature
+# ('*') forces Iosevka's cv01-cv69 and ss01-ss20 alternates - and with them the
+# entire 3,245-glyph charset, CJK included - into each subset. That inflates a
+# latin face to ~77 KB, ~80% of it unreachable through the subset's unicode-range.
+# The full build (terminal/desktop) keeps all features; only the web subsets
+# are restricted to what a browser needs.
+
+WEB_LAYOUT_FEATURES="calt,ccmp,clig,dnom,frac,kern,liga,locl,numr,zero"
+
 declare -A SUBSETS=(
   ["latin"]="$LATIN"
   ["latin-ext"]="$LATIN_EXT"
@@ -53,7 +63,7 @@ for font_file in "${WOFF2_FILES[@]}"; do
       --output-file="$out_file" \
       --flavor=woff2 \
       --unicodes="$unicodes" \
-      --layout-features='*' \
+      --layout-features="$WEB_LAYOUT_FEATURES" \
       --no-hinting \
       --desubroutinize
   done
